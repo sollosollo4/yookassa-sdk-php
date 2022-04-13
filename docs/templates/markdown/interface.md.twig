@@ -1,0 +1,111 @@
+{% extends 'layout.md.twig' %}
+{% block title %}Interface: {{ node.name }}{% endblock %}
+{% block content %}
+### Namespace: [{{ node.namespace }}]({{ node.namespace|route('url')|raw }})
+---
+{% if node.summary|length > 0%}
+**Summary:**
+
+{{ node.summary|raw }}
+
+{% endif %}
+{% if node.description|length > 0%}
+**Description:**
+
+{{ node.description|raw }}
+
+{% endif %}
+---
+### Constants
+{% set constants_list = node.inheritedConstants.merge(node.constants) %}
+{% if constants_list|length > 0 %}
+| Visibility | Name | Flag | Summary |
+| ----------:| ---- | ---- | ------- |
+{% for constant in constants_list %}
+* [{{ constant.visibility }} {{ constant.name }}]({{ constant|route('url')}}){{ constant.deprecated ? ' - (deprecated)' }}
+{% endfor %}
+{% else %}
+* No constants found
+{% endif %}
+{% set methods_list = node.inheritedMethods.merge(node.methods)|sortByVisibility %}
+{% if methods_list|length > 0 %}
+
+---
+### Methods
+| Visibility | Name | Flag | Summary |
+| ----------:| ---- | ---- | ------- |
+{% for method in methods_list if method.visibility == 'public' %}
+| {{ method.visibility }} | [{{ method.name }}()]({{ method|route('url')}}) | {{ method.deprecated ? '*deprecated*' }} | {{ method.summary|replace({"\n":" "})|raw }} |
+{% endfor %}
+{% for method in methods_list if method.visibility == 'protected' %}
+| {{ method.visibility }} | [{{ method.name }}()]({{ method|route('url')}}) | {{ method.deprecated ? '*deprecated*' }} | {{ method.summary|replace({"\n":" "})|raw }} |
+{% endfor %}
+{% for method in methods_list if method.visibility == 'private' %}
+| {{ method.visibility }} | [{{ method.name }}()]({{ method|route('url')}}) | {{ method.deprecated ? '*deprecated*' }} | {{ method.summary|replace({"\n":" "})|raw }} |
+{% endfor %}
+{% endif %}
+
+---
+### Details
+* File: [{{ node.path }}](../../{{ node.path }})
+{% if node.package is not empty and node.package != '\\' %}
+* Package: {{ node.subpackage ? (node.package ~ '\\' ~ node.subpackage) : node.package }}
+{% endif %}
+{% for parent in node.parent %}
+{% if loop.first %}
+* Parents:
+{% endif %}
+  * [{{ parent.fullyQualifiedStructuralElementName }}]({{ parent|route('url')|raw }})
+{% endfor %}
+{% for tagName,tags in node.tags if tagName in ['link', 'see'] %}
+{% if loop.first %}
+* See Also:
+{% endif %}
+{% for tag in tags %}
+  * [{{ tag.description ?: tag.reference }}]({{ (tag.reference|route('url')) ?: tag.link }})
+{% endfor %}
+{% endfor %}
+{% set tagCount = 0 %}
+{% for tagName,tags in node.tags if tagName not in ['link', 'see', 'abstract', 'method', 'package', 'subpackage'] %}
+{% for tag in tags %}
+{% set tagCount = tagCount + 1 %}
+{% endfor %}
+{% endfor %}
+{% if tagCount > 0 %}
+
+---
+### Tags
+| Tag | Version | Description |
+| --- | ------- | ----------- |
+{% for tagName,tags in node.tags if tagName not in ['link', 'see', 'abstract', 'method', 'package', 'subpackage'] %}
+{% for tag in tags %}
+| {{ tagName }} | {% if tag.version %}{{ tag.version }}{% endif %} | {{ tag.description|replace({"\n":" "})|raw }} |
+{% endfor %}
+{% endfor %}
+{% endif %}
+{% set constants = node.inheritedConstants.merge(node.constants) %}
+{% if constants|length > 0 %}
+
+---
+## Constants
+{% for constant in constants %}
+{{ block('constant') }}
+{% endfor %}
+{% endif %}
+{% set methods = node.inheritedMethods.merge(node.methods) %}
+{% if methods|length > 0 %}
+
+---
+## Methods
+{% for method in methods if method.visibility == 'public' %}
+{{ block('method') }}
+{% endfor %}
+{% for method in methods if method.visibility == 'protected' %}
+{{ block('method') }}
+{% endfor %}
+{% for method in methods if method.visibility == 'private' %}
+{{ block('method') }}
+{% endfor %}
+{% endif %}
+
+{% endblock %}

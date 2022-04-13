@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<template>
+    <name>markdown</name>
+    <author>YooMoney</author>
+    <email>cms@yoomoney.ru</email>
+    <version>2.0.7</version>
+    <description>Generate usage documentation in Markdown format so it can be published in Github/Gitlab.</description>
+    <transformations>
+        <transformation writer="twig" query="namespace" source="templates/markdown/namespace.md.twig" artifact="readme.html"/>
+        <transformation writer="twig" query="indexes.namespaces" source="templates/markdown/namespace.md.twig" />
+        <transformation writer="twig" query="indexes.classes" source="templates/markdown/class.md.twig" />
+        <transformation writer="twig" query="indexes.interfaces" source="templates/markdown/interface.md.twig" />
+        <transformation writer="twig" query="indexes.traits" source="templates/markdown/class.md.twig" />
+
+        <transformation writer="twig" source="templates/markdown/reports/errors.md.twig" artifact="reports/errors.html"/>
+        <transformation writer="twig" source="templates/markdown/reports/deprecated.md.twig" artifact="reports/deprecated.html"/>
+        <transformation writer="twig" source="templates/markdown/reports/markers.md.twig" artifact="reports/markers.html"/>
+    </transformations>
+    <parameters>
+        <parameter key="twig-debug">true</parameter>
+    </parameters>
+</template>

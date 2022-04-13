@@ -1,0 +1,8 @@
+{% if node.example %}
+    <dd class="phpdocumentor-tag-list__definition_example">
+        {{ include('components/description.html.twig', {'node': node}) }}
+        <section class="phpdocumentor-example">
+            <pre><code class="php">{{ tag.example|escape }}</code></pre>
+        </section>
+    </dd>
+{% endif %}

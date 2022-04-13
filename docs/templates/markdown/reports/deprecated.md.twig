@@ -1,0 +1,31 @@
+{% extends 'layout.md.twig' %}
+{% block title %}Deprecated Elements{% endblock %}
+{% block content %}
+{# NEW #}
+{% set deprecatedElements = project.indexes.elements|filter(element => element.deprecated) %}
+{%
+    set filesWithDeprecatedElements = deprecatedElements|reduce(
+        (unique, item) => item.file.path in unique|keys ? unique : unique|merge({(item.file.path): item.file}), {}
+    )
+%}
+{% if filesWithDeprecatedElements is not empty %}
+### Table of Contents
+{% for file in filesWithDeprecatedElements %}
+* [{{ file.path }}](../../{{ file.path }})
+{% endfor %}
+{% endif %}
+
+{% for file in filesWithDeprecatedElements %}
+<a id="{{ file.path }}"></a>
+#### [{{ file.path }}](../../{{ file.path }})
+| Line | Element | Description |
+| ---- | ------- | ----------- |
+{% for element in deprecatedElements|filter(el => el.file == file) %}
+{% for tag in element.tags.deprecated %}
+| {{ element.line }} | {{ element.fullyQualifiedStructuralElementName }} | {{ tag.description|replace({"\n":" "}) }} |
+{% endfor %}
+{% endfor %}
+{% else %}
+**No deprecations have been found in this project.**
+{% endfor %}
+{% endblock %}
